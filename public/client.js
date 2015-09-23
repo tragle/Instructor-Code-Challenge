@@ -4,9 +4,9 @@ var Client = Client || function() {
     
     function log(message) {
         /* Logs messages to debug console */
-        if (window.console && window.console.log) { // ignore if console unsupported
+        if (window.console && window.console.log) { 
             console.log(message);
-        }
+        } // else ignore if console unsupported
     }
 
     function ajax(url, callback) {
@@ -33,7 +33,7 @@ var Client = Client || function() {
         request.send();
     }
 
-    function apiSearch(title, callback) {
+    function searchAPI(title, callback) {
         /* Search the database for movie title and pass result to callback */
         var query = "s=" + title;
         ajax(API_URL + query, callback);
