@@ -52,11 +52,36 @@ var Client = Client || function() {
         var query = "i=" + id;
         ajax(API_URL + query, callback);
     }
+
+
+    // Favorites
+
+    function setFavorite(id, title) {
+        /* POST a new favorite to the Favorites API */
+        var request = new XMLHttpRequest(),
+            query = "oid=" + id; // TODO: Make this work with an object instead of querystring
+        request.open('POST', 'http://localhost:3000/favorites', true);
+        request.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded; charset=UTF-8');
+        request.send(query);
+    }
+
+    
     // Search
 
     var searchTerm = "";
     var searchResults = [];
-
+    var cache = {};  // TODO: cache server side too?
+    
+    function getFavoriteLink(id) {
+        /* Constructs an anchor tag to favorite a movie title */
+        var $a = document.createElement("a");
+        $a.href = "#";
+        $a.innerText = "Favorite";
+        $a.addEventListener("click", function() { 
+            setFavorite(id); // this works because the callback is a closure
+        });
+        return $a;
+    }
     function displaySearchResults() {
         var $list = document.querySelectorAll(".movies")[0];
         if (searchResults.length) {
