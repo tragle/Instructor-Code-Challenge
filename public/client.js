@@ -12,8 +12,10 @@ var Client = Client || function() {
     // API
     
     var API_URL = "http://www.omdbapi.com/?",
-        TEMPLATE_URL = "template.html",
-        ROOT_SELECTOR = "#app";
+        SEARCH_FORM_ID = "search-form",
+        SEARCH_INPUT_ID = "search-term";
+        
+
 
     function ajax(url, callback) {
         /* Send AJAX GET to URL and pass result to callback */
@@ -24,7 +26,7 @@ var Client = Client || function() {
         request.onload = function() { // Supporting only IE9+ to avoid more boilerplate
             if (request.status >= 200 && request.status < 400) {
                 // Successful request + response
-                var data = request.responseText;
+                var data = JSON.parse(request.responseText);
                 callback(data);
             } else {
                 // TODO: use onError callback?
@@ -45,23 +47,52 @@ var Client = Client || function() {
         ajax(API_URL + query, callback);
     }
 
-    // DOM
+    // Search
 
-    function loadTemplate(selector, callback) {
-        /* Inject template html into selector, passes reference to resulting DOM element to callback */
-        var $root = document.querySelectorAll(selector)[0] || document.body; // default to body if no matching elems
-       
-        ajax(TEMPLATE_URL, function(html) {
-            $root.innerHTML = html; // TODO: Make this safe
-            if (typeof callback === "function") {
-                callback($root);
+    var searchTerm = "";
+    var searchResults = [];
+
+    function displaySearchResults() {
+        var $list = document.querySelectorAll(".movies")[0];
+        if (searchResults.length) {
+            $list.innerHTML = "";
+            for (var i = 0; i < searchResults.length; i++) {
+                var $li = document.createElement("li"),
+                    title = searchResults[i].Title,
+                    id = searchResults[i].imdbID;
+                $li.innerText = title;
+                $li.id = id;
+                $list.appendChild($li);
             }
-        });
+        }
+    }
+    
+    function searchForTerm() {
+        if (searchTerm) {
+            searchAPI(searchTerm, function(data) {
+                if (data.Search) {
+                    searchResults = data.Search;
+                    displaySearchResults();
+                }
+            });
+        }
     }
 
-    loadTemplate(ROOT_SELECTOR); // Paint the template
+    var $form = document.getElementById(SEARCH_FORM_ID);
+    var $input = document.getElementById(SEARCH_INPUT_ID);
 
-
+    function setSearchTerm() {
+        searchTerm = $input.value;
+    }
+        
+    $input.addEventListener("change", setSearchTerm);
+ 
+    $form.addEventListener("submit", function(e) {
+        e.preventDefault();
+        searchForTerm();
+        $input.value = "";
+    });
+    
 }();
 
 
