@@ -4,8 +4,16 @@
         <title>OMDB Search</title>
     </head>
     <body>
-        <div id="app"></div>
-
+        <div id="app">
+            <form id="search-form"">
+                <input type="text" id="search-term" placeholder="Movie title" />
+                <button type="submit">Submit</button>
+            </form>
+            <div>
+                <ol class="movies"></ol>
+            </div>
+        </div>
+        
         <script src="client.js"></script>
     </body>
 </html>
