@@ -82,6 +82,7 @@ var Client = Client || function() {
         });
         return $a;
     }
+    
     function displaySearchResults() {
         /* 
          Iterates through search results and appends a table row for each listing 
@@ -136,7 +137,7 @@ var Client = Client || function() {
         
     $input.addEventListener("change", setSearchTerm);
  
-    $form.addEventListener("submit", function(e) {
+    $form.addEventListener("submit", function(e) { // using submit to support pressing Enter in input box
         e.preventDefault();
         searchForTerm();
         $input.value = "";
