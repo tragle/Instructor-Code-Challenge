@@ -41,12 +41,17 @@ var Client = Client || function() {
         request.send();
     }
 
-    function searchAPI(title, callback) {
+    function searchTitle(title, callback) {
         /* Search the database for movie title and pass result to callback */
         var query = "s=" + title;
         ajax(API_URL + query, callback);
     }
 
+    function searchId(id, callback) {
+        /* Get details about a particular movie */
+        var query = "i=" + id;
+        ajax(API_URL + query, callback);
+    }
     // Search
 
     var searchTerm = "";
