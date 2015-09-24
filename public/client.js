@@ -83,16 +83,28 @@ var Client = Client || function() {
         return $a;
     }
     function displaySearchResults() {
-        var $list = document.querySelectorAll(".movies")[0];
-        if (searchResults.length) {
-            $list.innerHTML = "";
+        /* 
+         Iterates through search results and appends a table row for each listing 
+         
+         Each row looks like: 
+         <tr><td>Star Wars</td><td><a href="#">Favorite</a></td></tr>
+         
+         */
+        var $table = document.querySelectorAll(".movie-list")[0];
+        if (searchResults.length) { // don't bother if there's nothing to show
+            $table.innerHTML = "";  // clear out the last results
             for (var i = 0; i < searchResults.length; i++) {
-                var $li = document.createElement("li"),
+                var $tr = document.createElement("tr"),
+                    $titleTD = document.createElement("td"),
+                    $favTD = document.createElement("td"),
                     title = searchResults[i].Title,
-                    id = searchResults[i].imdbID;
-                $li.innerText = title;
-                $li.id = id;
-                $list.appendChild($li);
+                    id = searchResults[i].imdbID,
+                    $a = getFavoriteLink(id, title);
+                $titleTD.innerText = title; 
+                $favTD.appendChild($a);
+                $tr.appendChild($titleTD);
+                $tr.appendChild($favTD);
+                $table.appendChild($tr);
             }
         }
     }
