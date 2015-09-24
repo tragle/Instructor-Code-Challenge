@@ -98,7 +98,7 @@ var Client = Client || function() {
         /* Constructs an anchor tag to favorite a movie title */
         var $a = document.createElement("a");
         $a.href = "#";
-        $a.innerText = "Favorite";
+        $a.innerHTML = "Favorite";
         $a.addEventListener("click", function() { 
             setFavorite(id); // this works because the callback is a closure
         });
@@ -134,7 +134,7 @@ var Client = Client || function() {
                     title = searchResults[i].Title,
                     id = searchResults[i].imdbID,
                     $a = getFavoriteLink(id, title);
-                $titleTD.innerText = title; 
+                $titleTD.innerHTML = title; 
                 $favTD.appendChild($a);
                 $tr.appendChild($titleTD);
                 $tr.appendChild($favTD);
