@@ -56,12 +56,33 @@ var Client = Client || function() {
 
     // Favorites
 
-    function setFavorite(id, title) {
+    var favorites = {};
+
+    function setFavorites(obj) {
+        favorites = obj;
+        displaySearchResults();
+    }
+    
+    function fetchFavorites() {
+        ajax("/favorites",  setFavorites);
+    }
+    
+    function setFavorite(id) {
         /* POST a new favorite to the Favorites API */
         var request = new XMLHttpRequest(),
             query = "oid=" + id; // TODO: Make this work with an object instead of querystring
         request.open('POST', 'http://localhost:3000/favorites', true);
         request.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded; charset=UTF-8');
+        request.onload = function() { // Supporting only IE9+ to avoid more boilerplate
+            if (request.status >= 200 && request.status < 400) {
+                // Successful request + response
+                var data = JSON.parse(request.responseText);
+                setFavorites(data);
+            } else {
+                // TODO: use onError callback?
+                throw new Error("Unable to complete AJAX request due to server error");
+            }
+        };
         request.send(query);
     }
 
@@ -72,6 +93,7 @@ var Client = Client || function() {
     var searchResults = [];
     var cache = {};  // TODO: cache server side too?
     
+    
     function getFavoriteLink(id) {
         /* Constructs an anchor tag to favorite a movie title */
         var $a = document.createElement("a");
@@ -81,6 +103,17 @@ var Client = Client || function() {
             setFavorite(id); // this works because the callback is a closure
         });
         return $a;
+    }
+
+    function addFavoriteClass(element) {
+        /* Adds the favorite class to DOM element and returns it */
+        var className = "favorite";
+        if (element.classList) {
+            element.classList.add(className);
+        } else {
+            element.className += " " + className;
+        }
+        return element;
     }
     
     function displaySearchResults() {
@@ -105,6 +138,9 @@ var Client = Client || function() {
                 $favTD.appendChild($a);
                 $tr.appendChild($titleTD);
                 $tr.appendChild($favTD);
+                if (id in favorites) {
+                    $tr = addFavoriteClass($tr);
+                }
                 $table.appendChild($tr);
             }
         }
@@ -142,6 +178,8 @@ var Client = Client || function() {
         searchForTerm();
         $input.value = "";
     });
+
+    fetchFavorites();
     
 }();
 
