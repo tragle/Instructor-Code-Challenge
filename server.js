@@ -16,14 +16,14 @@ app.get('/favorites', function(req, res){
   res.send(data);
 });
 
-app.get('favorites', function(req, res){
-  if(!req.body.name || !req.body.oid){
+app.post('/favorites', function(req, res){
+  if(!req.body.oid){
     res.send("Error");
       return;
   }
   
   var data = JSON.parse(fs.readFileSync('./data.json'));
-  data.push(req.body);
+  data.push(req.body.oid);
   fs.writeFile('./data.json', JSON.stringify(data));
   res.setHeader('Content-Type', 'application/json');
   res.send(data);
