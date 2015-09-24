@@ -20,13 +20,17 @@ app.post('/favorites', function(req, res){
   if(!req.body.oid){
     res.send("Error");
       return;
-  }
+  }   
   
-  var data = JSON.parse(fs.readFileSync('./data.json'));
-  data.push(req.body.oid);
-  fs.writeFile('./data.json', JSON.stringify(data));
-  res.setHeader('Content-Type', 'application/json');
-  res.send(data);
+    var data = JSON.parse(fs.readFileSync('./data.json'));
+    if (req.body.oid in data) {
+        data[req.body.oid]++;
+    } else {
+        data[req.body.oid] = 1;
+    }
+    fs.writeFile('./data.json', JSON.stringify(data));
+    res.setHeader('Content-Type', 'application/json');
+    res.send(data);
 });
 
 app.listen(3000, function(){
