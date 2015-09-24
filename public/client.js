@@ -73,13 +73,20 @@ var Client = Client || function() {
     }
     
     function searchForTerm() {
+        /* Check the cache or api for search results, and display */
         if (searchTerm) {
-            searchAPI(searchTerm, function(data) {
-                if (data.Search) {
-                    searchResults = data.Search;
-                    displaySearchResults();
-                }
-            });
+            if (cache[searchTerm]) { // if the term exists in the cache, use it
+                searchResults = cache[searchTerm];
+                displaySearchResults();
+            } else { // otherwise get the results from the api and add to the cache
+                searchTitle(searchTerm, function(data) {
+                    if (data.Search) {
+                        searchResults = data.Search;
+                        cache[searchTerm] = searchResults;
+                        displaySearchResults();
+                    }
+                });
+            }
         }
     }
 
