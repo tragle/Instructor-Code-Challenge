@@ -21,8 +21,6 @@ var Client = Client || function() {
     
     // API
     
-
-
     function ajax(url, callback) {
         /* Send AJAX GET to URL and pass result to callback */
         
@@ -74,10 +72,10 @@ var Client = Client || function() {
         ajax("/favorites",  setFavorites);
     }
     
-    function addFavorite(id) {
+    function addFavorite(id, title) {
         /* POST a new favorite to the Favorites API */
         var request = new XMLHttpRequest(),
-            query = "oid=" + id; // TODO: Make this work with an object instead of querystring
+            query = "oid=" + id + "&title=" + title; // TODO: Make this work with an object instead of querystring
         request.open('POST', '/favorites', true);
         request.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded; charset=UTF-8');
         request.onload = function() { 
@@ -91,16 +89,26 @@ var Client = Client || function() {
         request.send(query);
     }
 
-    // Search
+    function showAllFavorites() {
+        /* Render only favorites */
+        var movies = [];
+        for (var id in favorites) {
+            movies.push({imdbID: id, Title: favorites[id]}); // TODO: generalize property names instead of using api's
+        }
+        lastSearchResults = movies;
+        renderSearchResults(movies);
+    }
+    
+    // Search and movie list
 
-    function getFavoriteLink(id) {
+    function getFavoriteLink(id, title) {
         /* Constructs an anchor tag to favorite a movie title */
         var $a = document.createElement("a");
         $a.href = "#";
         $a.innerHTML = "&#9786;"; // smiley
         $a.title = "Add favorite"; // this will display a tooltip on mouse hover
         $a.addEventListener("click", function() { 
-            addFavorite(id); // this works because the callback is a closure
+            addFavorite(id, title); // this works because the callback is a closure
         });
         $a = addClass($a, "fav-control");
         return $a;
@@ -210,8 +218,6 @@ var Client = Client || function() {
         }
     }
 
-
-    
     function showMovieDetails(movieId) {
         /* Searches the cache, then the api for the clicked movie and renders the result */
         if (movieId) { 
@@ -240,17 +246,30 @@ var Client = Client || function() {
 
     function handleKeyup(event) {
         var searchTerm = event.target.value;
-        searchForTerm(searchTerm);
+        if (searchTerm) { // search if the input is not empty
+            searchForTerm(searchTerm);
+        } else { // otherwise clear out the movie list
+            lastSearchResults = [];
+            clearSearchResults();
+        }
+    }
+
+    function handleAllFavoritesClick(event) {
+        event.preventDefault();
+        showAllFavorites();
     }
     
     // Init
     
     var $input = document.getElementById("search-term");
+    var $allFavorites = document.getElementById("all-favorites");
 
     $input.addEventListener("keyup", handleKeyup); // search while typing
  
     fetchFavorites();
     setInterval(fetchFavorites, REFRESH_RATE_MS); // Periodically download favorites in case other users have made changes
+
+    $allFavorites.addEventListener("click", handleAllFavoritesClick);
     
 }();
 

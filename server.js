@@ -19,13 +19,13 @@ app.get('/favorites', function(req, res){
 });
 
 app.post('/favorites', function(req, res){
-  if(!req.body.oid){
+  if(!req.body.oid || !req.body.title){
     res.send("Error");
       return;
   }   
   
     var data = JSON.parse(fs.readFileSync('./data.json'));
-    data[req.body.oid] = true;
+    data[req.body.oid] = req.body.title;
     fs.writeFile('./data.json', JSON.stringify(data));
     res.setHeader('Content-Type', 'application/json');
     res.send(data);
