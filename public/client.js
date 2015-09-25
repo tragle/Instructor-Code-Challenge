@@ -12,7 +12,7 @@ var Client = Client || function() {
     // Globals
 
     var favorites = {},
-        lastSearchResults = [],
+        lastMovieList = [],
         searchCache = {},
         detailsCache = {};
 
@@ -64,7 +64,7 @@ var Client = Client || function() {
     function setFavorites(obj) {
         /* update the local copy of favorites */
         favorites = obj;
-        renderSearchResults(); // we re-render because the model now includes a new favorite
+        renderMovieList(); // we re-render because the model now includes a new favorite
     }
     
     function fetchFavorites() {
@@ -95,11 +95,11 @@ var Client = Client || function() {
         for (var id in favorites) {
             movies.push({imdbID: id, Title: favorites[id]}); // TODO: generalize property names instead of using api's
         }
-        lastSearchResults = movies;
-        renderSearchResults(movies);
+        lastMovieList = movies;
+        renderMovieList(movies);
     }
     
-    // Search and movie list
+    // Movie list
 
     function getFavoriteLink(id, title) {
         /* Constructs an anchor tag to favorite a movie title */
@@ -124,7 +124,7 @@ var Client = Client || function() {
         return element;
     }
     
-    function renderSearchResults(searchResults) {
+    function renderMovieList(movies) {
         /* 
          Iterates through search results and appends a table row for each listing 
          
@@ -132,16 +132,16 @@ var Client = Client || function() {
          <tr><td>Star Wars</td><td><a href="#">Favorite</a></td></tr>
          
          */
-        searchResults = searchResults || lastSearchResults; // if nothing is passed in, just use last results
+        movies = movies || lastMovieList; // if nothing is passed in, just use last results
         var $table = document.querySelectorAll("#movie-list")[0]; // TODO: use config instead of element id
-        if (searchResults.length) { // don't bother if there's nothing to show
-            clearSearchResults(); // start blank
-            for (var i = 0; i < searchResults.length; i++) {
+        if (movies.length) { // don't bother if there's nothing to show
+            clearMovieList(); // start blank
+            for (var i = 0; i < movies.length; i++) {
                 var $tr = document.createElement("tr"),
                     $titleTD = document.createElement("td"),
                     $favTD = document.createElement("td"),
-                    title = searchResults[i].Title,
-                    id = searchResults[i].imdbID,
+                    title = movies[i].Title,
+                    id = movies[i].imdbID,
                     $a = getFavoriteLink(id, title);
                 // first TD contains the title
                 $titleTD.innerHTML = title;
@@ -158,39 +158,39 @@ var Client = Client || function() {
                 $tr.appendChild($favTD);
                 $table.appendChild($tr);
             }
-            showSearchResults();
+            showMovieList();
         }
     }
 
-    function clearSearchResults() {
+    function clearMovieList() {
         var $table = document.querySelectorAll("#movie-list")[0];
         $table.innerHTML = "";
         $table.style.display = "none";
     }
 
-    function showSearchResults() {
+    function showMovieList() {
         var $table = document.querySelectorAll("#movie-list")[0];
         $table.style.display = "table";
     }
 
     function searchForTerm(searchTerm) {
         /* Check the cache or api for search results, and display */
-            var searchResults = [];
+        var searchResults = [];
         if (searchTerm) {
             if (searchCache[searchTerm]) { // if the term exists in the cache, use it
-                searchResults = lastSearchResults = searchCache[searchTerm];
-                renderSearchResults(searchResults);
+                searchResults = lastMovieList = searchCache[searchTerm];
+                renderMovieList(searchResults);
             } else { // otherwise get the results from the api and add to the cache
                 searchTitle(searchTerm, function(data) {
                     if (data.Search) {
                         searchResults = data.Search;
-                        searchCache[searchTerm] = lastSearchResults = searchResults;
-                        renderSearchResults(searchResults);
+                        searchCache[searchTerm] = lastMovieList = searchResults;
+                        renderMovieList(searchResults);
                     }
                 });
             }
         } else {
-            clearSearchResults();
+            clearMovieList();
             hideMovieDetails();
         }
     }
@@ -249,8 +249,8 @@ var Client = Client || function() {
         if (searchTerm) { // search if the input is not empty
             searchForTerm(searchTerm);
         } else { // otherwise clear out the movie list
-            lastSearchResults = [];
-            clearSearchResults();
+            lastMovieList = [];
+            clearMovieList();
         }
     }
 
