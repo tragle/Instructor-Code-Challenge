@@ -78,7 +78,7 @@ var Client = Client || function() {
         /* POST a new favorite to the Favorites API */
         var request = new XMLHttpRequest(),
             query = "oid=" + id; // TODO: Make this work with an object instead of querystring
-        request.open('POST', 'http://localhost:3000/favorites', true);
+        request.open('POST', '/favorites', true);
         request.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded; charset=UTF-8');
         request.onload = function() { 
             if (request.status >= 200 && request.status < 400) {
