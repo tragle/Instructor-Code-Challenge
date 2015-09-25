@@ -23,11 +23,7 @@ app.post('/favorites', function(req, res){
   }   
   
     var data = JSON.parse(fs.readFileSync('./data.json'));
-    if (req.body.oid in data) {
-        data[req.body.oid]++;
-    } else {
-        data[req.body.oid] = 1;
-    }
+    data[req.body.oid] = true;
     fs.writeFile('./data.json', JSON.stringify(data));
     res.setHeader('Content-Type', 'application/json');
     res.send(data);
