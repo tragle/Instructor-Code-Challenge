@@ -60,7 +60,7 @@ var Client = Client || function() {
 
     function setFavorites(obj) {
         favorites = obj;
-        displaySearchResults();
+        renderSearchResults();
     }
     
     function fetchFavorites() {
@@ -73,13 +73,11 @@ var Client = Client || function() {
             query = "oid=" + id; // TODO: Make this work with an object instead of querystring
         request.open('POST', 'http://localhost:3000/favorites', true);
         request.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded; charset=UTF-8');
-        request.onload = function() { // Supporting only IE9+ to avoid more boilerplate
+        request.onload = function() { 
             if (request.status >= 200 && request.status < 400) {
-                // Successful request + response
                 var data = JSON.parse(request.responseText);
                 setFavorites(data);
             } else {
-                // TODO: use onError callback?
                 throw new Error("Unable to complete AJAX request due to server error");
             }
         };
@@ -89,8 +87,7 @@ var Client = Client || function() {
     
     // Search
 
-    var searchTerm = "";
-    var searchResults = [];
+    var lastSearchResults = [];
     var cache = {};  // TODO: cache server side too?
     
     
@@ -105,9 +102,8 @@ var Client = Client || function() {
         return $a;
     }
 
-    function addFavoriteClass(element) {
+    function addClass(element, className) {
         /* Adds the favorite class to DOM element and returns it */
-        var className = "favorite";
         if (element.classList) {
             element.classList.add(className);
         } else {
@@ -116,7 +112,7 @@ var Client = Client || function() {
         return element;
     }
     
-    function displaySearchResults() {
+    function renderSearchResults(searchResults) {
         /* 
          Iterates through search results and appends a table row for each listing 
          
@@ -124,6 +120,7 @@ var Client = Client || function() {
          <tr><td>Star Wars</td><td><a href="#">Favorite</a></td></tr>
          
          */
+        searchResults = searchResults || lastSearchResults;
         var $table = document.querySelectorAll(".movie-list")[0];
         if (searchResults.length) { // don't bother if there's nothing to show
             $table.innerHTML = "";  // clear out the last results
@@ -134,51 +131,96 @@ var Client = Client || function() {
                     title = searchResults[i].Title,
                     id = searchResults[i].imdbID,
                     $a = getFavoriteLink(id, title);
-                $titleTD.innerHTML = title; 
+                $titleTD.innerHTML = title;
+                $titleTD.id = id;
+                $titleTD.addEventListener("click", showMovieDetails);
                 $favTD.appendChild($a);
                 $tr.appendChild($titleTD);
                 $tr.appendChild($favTD);
                 if (id in favorites) {
-                    $tr = addFavoriteClass($tr);
+                    $tr = addClass($tr, "favorite");
                 }
                 $table.appendChild($tr);
             }
         }
     }
+
+    function clearSearchResults() {
+        var $table = document.querySelectorAll(".movie-list")[0];
+        $table.innerHTML = "";
+    }
     
-    function searchForTerm() {
+    function searchForTerm(event) {
         /* Check the cache or api for search results, and display */
+        var searchTerm = event.target.value,
+            searchResults = [];
         if (searchTerm) {
             if (cache[searchTerm]) { // if the term exists in the cache, use it
-                searchResults = cache[searchTerm];
-                displaySearchResults();
+                searchResults = lastSearchResults = cache[searchTerm];
+                renderSearchResults(searchResults);
             } else { // otherwise get the results from the api and add to the cache
                 searchTitle(searchTerm, function(data) {
                     if (data.Search) {
                         searchResults = data.Search;
-                        cache[searchTerm] = searchResults;
-                        displaySearchResults();
+                        cache[searchTerm] = lastSearchResults = searchResults;
+                        renderSearchResults(searchResults);
                     }
                 });
             }
+        } else {
+            clearSearchResults();
+            hideMovieDetails();
         }
     }
 
+    // Movie details
+
+    function isValidImage(filename) {
+        /* returns true if the filename ends in an image extension */
+        return /\.jpg$|\.png$|\.gif$|\.svg$/.test(filename.trim());
+    }
+    
+    function renderMovieDetails(data) {
+        /* Injects movie data into details area */
+        if (data) {
+            var poster = document.getElementById("movie-poster"),
+                title = document.getElementById("movie-title"),
+                year = document.getElementById("movie-year"),
+                rating = document.getElementById("movie-rating"),
+                director = document.getElementById("movie-director"),
+                cast = document.getElementById("movie-cast"),
+                plot = document.getElementById("movie-plot"),
+                details = document.getElementById("movie-details");
+            poster.src = isValidImage(data.Poster) ? data.Poster : "no_image.svg",
+            title.innerHTML = data.Title || "";
+            year.innerHTML = data.Year || "";
+            rating.innerHTML = data.Rated || "";
+            director.innerHTML = data.Director || "";
+            cast.innerHTML = data.Actors || "";
+            plot.innerHTML = data.Plot || "";
+            details.style.display = "block";
+        }
+    }
+    
+    function showMovieDetails(event) {
+        /* Searches the clicked movie and renders the result */
+        if (event.target.id) {
+            searchId(event.target.id, renderMovieDetails);
+        }
+    }
+
+    function hideMovieDetails() {
+        var details = document.getElementById("movie-details");
+        details.style.display = "none";
+    }
+
+    // Init
+    
     var $form = document.getElementById(SEARCH_FORM_ID);
     var $input = document.getElementById(SEARCH_INPUT_ID);
 
-    function setSearchTerm() {
-        searchTerm = $input.value;
-    }
-        
-    $input.addEventListener("change", setSearchTerm);
+    $input.addEventListener("keyup", searchForTerm);
  
-    $form.addEventListener("submit", function(e) { // using submit to support pressing Enter in input box
-        e.preventDefault();
-        searchForTerm();
-        $input.value = "";
-    });
-
     fetchFavorites();
     
 }();
