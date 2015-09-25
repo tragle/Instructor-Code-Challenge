@@ -270,6 +270,8 @@ var Client = Client || function() {
     setInterval(fetchFavorites, REFRESH_RATE_MS); // Periodically download favorites in case other users have made changes
 
     $allFavorites.addEventListener("click", handleAllFavoritesClick);
+
+    $input.focus();
     
 }();
 
