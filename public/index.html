@@ -5,11 +5,29 @@
         <style>
          body {
              font-family: sans-serif;
+             font-size: 14pt;
          }
 
+         a {
+             text-decoration: none;
+         }
+
+         a.fav-control {
+             opacity: 0.5;
+             border-radius: 10px;
+         }
+
+         a.favorite {
+             opacity: 1;
+         }
+
+         a:hover {
+             opacity: 1;
+         }
+         
          #header {
              background-color: lightgray;
-             padding: 10px;
+             padding: 7px;
          }
          
          #app {
@@ -20,11 +38,28 @@
              margin-left: 10px;
              margin-bottom: 10px;
          }
+
+         #search-term {
+             width: 200px;
+         }
          
          #movie-list {
              width: 45%;
              float: left;
              padding: 1%;
+             border-top: 1px solid lightgray;
+             margin-top: 5px;
+         }
+
+         #movie-list td {
+             padding-top: 0.5em;
+             padding-bottom: 0.5em;
+             border-bottom: 1px solid lightgray;
+             cursor: pointer;
+         }
+
+         #movie-list td:hover {
+             background-color: lightblue;
          }
          
          #movie-details {
@@ -62,6 +97,7 @@
                 <div><b>Rated:</b> <span id="movie-rating"></span></div>
                 <div><b>Director:</b> <span id="movie-director"></span></div>
                 <div><b>Cast:</b> <span id="movie-cast"></span></div>
+                <br>
                 <div id="movie-plot"></div>
                 <hr/>
             </div>

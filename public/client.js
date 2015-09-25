@@ -96,10 +96,12 @@ var Client = Client || function() {
         /* Constructs an anchor tag to favorite a movie title */
         var $a = document.createElement("a");
         $a.href = "#";
-        $a.innerHTML = "Favorite";
+        $a.innerHTML = "&#9786;";
+        $a.title = "Add favorite";
         $a.addEventListener("click", function() { 
             setFavorite(id); // this works because the callback is a closure
         });
+        $a = addClass($a, "fav-control");
         return $a;
     }
 
@@ -135,12 +137,12 @@ var Client = Client || function() {
                 $titleTD.innerHTML = title;
                 $titleTD.id = id;
                 $titleTD.addEventListener("click", showMovieDetails);
+                if (id in favorites) {
+                    $a = addClass($a, "favorite");
+                }
                 $favTD.appendChild($a);
                 $tr.appendChild($titleTD);
                 $tr.appendChild($favTD);
-                if (id in favorites) {
-                    $tr = addClass($tr, "favorite");
-                }
                 $table.appendChild($tr);
             }
         }
