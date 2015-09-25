@@ -15,10 +15,13 @@ var Client = Client || function() {
         lastSearchResults = [],
         searchCache = {},
         detailsCache = {};
+
+    var API_URL = "http://www.omdbapi.com/?",
+        REFRESH_RATE_MS = 3000;
     
     // API
     
-    var API_URL = "http://www.omdbapi.com/?";
+
 
     function ajax(url, callback) {
         /* Send AJAX GET to URL and pass result to callback */
@@ -235,7 +238,7 @@ var Client = Client || function() {
     $input.addEventListener("keyup", searchForTerm); // search while typing
  
     fetchFavorites();
-    setInterval(fetchFavorites, 10000); // Refresh favorites in case other users have made changes
+    setInterval(fetchFavorites, REFRESH_RATE_MS); // Periodically download favorites in case other users have made changes
     
 }();
 
