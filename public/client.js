@@ -11,10 +11,10 @@ var Client = Client || function() {
 
     // Globals
 
-    var favorites = {},
-        lastMovieList = [],
-        searchCache = {},
-        detailsCache = {};
+    var favorites = {},     // key is imdb id, value is title
+        lastMovieList = [], // lets us re-render the same movie list by saving a backup
+        searchCache = {},   // key is search term, value is search results
+        detailsCache = {};  // key is movie id, value is movie detail object
 
     var API_URL = "http://www.omdbapi.com/?",
         REFRESH_RATE_MS = 3000;
