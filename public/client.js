@@ -138,7 +138,7 @@ var Client = Client || function() {
                 // first TD contains the title
                 $titleTD.innerHTML = title;
                 $titleTD.id = id;
-                $titleTD.addEventListener("click", showMovieDetails);
+                $titleTD.addEventListener("click", handleTitleClick);
                 // second TD will contain an anchor tag
                 // TODO: Use span instead of anchor?
                 if (id in favorites) { 
@@ -164,11 +164,10 @@ var Client = Client || function() {
         var $table = document.querySelectorAll("#movie-list")[0];
         $table.style.display = "table";
     }
-    
-    function searchForTerm(event) {
+
+    function searchForTerm(searchTerm) {
         /* Check the cache or api for search results, and display */
-        var searchTerm = event.target.value,
-            searchResults = [];
+            var searchResults = [];
         if (searchTerm) {
             if (searchCache[searchTerm]) { // if the term exists in the cache, use it
                 searchResults = lastSearchResults = searchCache[searchTerm];
@@ -210,10 +209,11 @@ var Client = Client || function() {
             details.style.display = "block";
         }
     }
+
+
     
-    function showMovieDetails(event) {
+    function showMovieDetails(movieId) {
         /* Searches the cache, then the api for the clicked movie and renders the result */
-        var movieId = event.target.id;
         if (movieId) { 
             if (movieId in detailsCache) { // use the cached details if they exist
                 renderMovieDetails(detailsCache[movieId]);
@@ -231,11 +231,23 @@ var Client = Client || function() {
         details.style.display = "none";
     }
 
+    // Event handlers
+
+    function handleTitleClick(event) {
+        var movieId = event.target.id;
+        showMovieDetails(movieId);
+    }
+
+    function handleKeyup(event) {
+        var searchTerm = event.target.value;
+        searchForTerm(searchTerm);
+    }
+    
     // Init
     
     var $input = document.getElementById("search-term");
 
-    $input.addEventListener("keyup", searchForTerm); // search while typing
+    $input.addEventListener("keyup", handleKeyup); // search while typing
  
     fetchFavorites();
     setInterval(fetchFavorites, REFRESH_RATE_MS); // Periodically download favorites in case other users have made changes
