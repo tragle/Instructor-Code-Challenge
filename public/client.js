@@ -50,7 +50,7 @@ var Client = Client || function() {
     function searchId(id, callback) {
         /* Get details about a particular movie */
         var query = "i=" + id;
-        ajax(API_URL + query, callback);
+        ajax(API_URL + query, callback);      
     }
 
 
@@ -88,7 +88,8 @@ var Client = Client || function() {
     // Search
 
     var lastSearchResults = [];
-    var cache = {};  // TODO: cache server side too?
+    var searchCache = {};
+    var detailsCache = {};
     
     
     function getFavoriteLink(id) {
@@ -155,14 +156,14 @@ var Client = Client || function() {
         var searchTerm = event.target.value,
             searchResults = [];
         if (searchTerm) {
-            if (cache[searchTerm]) { // if the term exists in the cache, use it
-                searchResults = lastSearchResults = cache[searchTerm];
+            if (searchCache[searchTerm]) { // if the term exists in the cache, use it
+                searchResults = lastSearchResults = searchCache[searchTerm];
                 renderSearchResults(searchResults);
             } else { // otherwise get the results from the api and add to the cache
                 searchTitle(searchTerm, function(data) {
                     if (data.Search) {
                         searchResults = data.Search;
-                        cache[searchTerm] = lastSearchResults = searchResults;
+                        searchCache[searchTerm] = lastSearchResults = searchResults;
                         renderSearchResults(searchResults);
                     }
                 });
@@ -203,9 +204,17 @@ var Client = Client || function() {
     }
     
     function showMovieDetails(event) {
-        /* Searches the clicked movie and renders the result */
-        if (event.target.id) {
-            searchId(event.target.id, renderMovieDetails);
+        /* Searches the cache, then the api for the clicked movie and renders the result */
+        var movieId = event.target.id;
+        if (movieId) {
+            if (movieId in detailsCache) {
+                renderMovieDetails(detailsCache[movieId]);
+            } else {
+                searchId(movieId, function(data) {
+                    renderMovieDetails(data);
+                    detailsCache[movieId] = data;
+                });
+            }
         }
     }
 
