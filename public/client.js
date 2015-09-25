@@ -121,7 +121,7 @@ var Client = Client || function() {
          
          */
         searchResults = searchResults || lastSearchResults;
-        var $table = document.querySelectorAll(".movie-list")[0];
+        var $table = document.querySelectorAll("#movie-list")[0];
         if (searchResults.length) { // don't bother if there's nothing to show
             $table.innerHTML = "";  // clear out the last results
             for (var i = 0; i < searchResults.length; i++) {
@@ -146,7 +146,7 @@ var Client = Client || function() {
     }
 
     function clearSearchResults() {
-        var $table = document.querySelectorAll(".movie-list")[0];
+        var $table = document.querySelectorAll("#movie-list")[0];
         $table.innerHTML = "";
     }
     

@@ -7,13 +7,30 @@
              font-family: sans-serif;
          }
 
+         #app {
+             margin: 10px;
+         }
+         
+         #movie-list {
+             width: 45%;
+             float: left;
+             padding: 1%;
+         }
+         
          #movie-details {
              display: none;
+             width: 48%;
+             float: right;
          }
 
          .favorite {
              background-color: lightgreen;
          }
+
+         .movie-poster {
+             max-height: 12em;
+         }
+         
          
          
         </style>
@@ -21,23 +38,26 @@
     <body>
         <div id="app">
             <form id="search-form">
-                <input type="text" id="search-term" placeholder="Movie title" />
+                <label for="search">Search: </label>
+                <input type="text" name="search" id="search-term" placeholder="Movie title" />
             </form>
             <div>
-                <table class="movie-list"></table>
+                <table id="movie-list"></table>
             </div>
             <div id="movie-details">
+                <hr/>
                 <div><img id="movie-poster" /></div>
                 <div><h3 id="movie-title"></h3></div>
-                <div>Year: <span id="movie-year"></span></div> 
-                <div>Rated: <span id="movie-rating"></span></div>
-                <div>Director: <span id="movie-director"></span></div>
-                <div>Cast: <span id="movie-cast"></span></div>
+                <div><b>Year:</b> <span id="movie-year"></span></div> 
+                <div><b>Rated:</b> <span id="movie-rating"></span></div>
+                <div><b>Director:</b> <span id="movie-director"></span></div>
+                <div><b>Cast:</b> <span id="movie-cast"></span></div>
                 <div id="movie-plot"></div>
+                <hr/>
             </div>
                 
         </div>
-        
+
         <script src="client.js"></script>
     </body>
 </html>
