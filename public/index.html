@@ -28,6 +28,7 @@
          #header {
              background-color: lightgray;
              padding: 7px;
+             border-radius: 4px;
          }
          
          #app {
@@ -37,18 +38,21 @@
          #search-form {
              margin-left: 10px;
              margin-bottom: 10px;
+             font-size: 16pt;
          }
 
          #search-term {
-             width: 200px;
+             width: 30%;
+             font-size: 16pt;
          }
          
          #movie-list {
              width: 45%;
              float: left;
              padding: 1%;
-             border-top: 1px solid lightgray;
+             border: 1px solid lightgray;
              margin-top: 5px;
+             border-radius: 10px;
          }
 
          #movie-list td {
@@ -66,6 +70,9 @@
              display: none;
              width: 48%;
              float: right;
+             border: 1px solid lightgray;
+             border-radius: 10px;
+             padding: 10px;
          }
 
          .favorite {
@@ -75,8 +82,6 @@
          .movie-poster {
              max-height: 12em;
          }
-         
-         
          
         </style>
     </head>
@@ -99,7 +104,6 @@
                 <div><b>Cast:</b> <span id="movie-cast"></span></div>
                 <br>
                 <div id="movie-plot"></div>
-                <hr/>
             </div>
                 
         </div>
