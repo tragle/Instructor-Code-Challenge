@@ -127,7 +127,7 @@ var Client = Client || function() {
         searchResults = searchResults || lastSearchResults; // if nothing is passed in, just use last results
         var $table = document.querySelectorAll("#movie-list")[0]; // TODO: use config instead of element id
         if (searchResults.length) { // don't bother if there's nothing to show
-            $table.innerHTML = "";  // clear out the last results
+            clearSearchResults(); // start blank
             for (var i = 0; i < searchResults.length; i++) {
                 var $tr = document.createElement("tr"),
                     $titleTD = document.createElement("td"),
@@ -150,12 +150,19 @@ var Client = Client || function() {
                 $tr.appendChild($favTD);
                 $table.appendChild($tr);
             }
+            showSearchResults();
         }
     }
 
     function clearSearchResults() {
         var $table = document.querySelectorAll("#movie-list")[0];
         $table.innerHTML = "";
+        $table.style.display = "none";
+    }
+
+    function showSearchResults() {
+        var $table = document.querySelectorAll("#movie-list")[0];
+        $table.style.display = "table";
     }
     
     function searchForTerm(event) {
