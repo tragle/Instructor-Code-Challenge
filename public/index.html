@@ -39,14 +39,16 @@
              margin-left: 10px;
              margin-bottom: 10px;
              font-size: 16pt;
+             width: 45%;
          }
 
          #search-term {
-             width: 30%;
+             width: 95%;
              font-size: 16pt;
          }
          
          #movie-list {
+             display: none;
              width: 45%;
              float: left;
              padding: 1%;
@@ -89,7 +91,6 @@
         <div id="header"><h2>OMDB Search</h1></div>
         <div id="app">
             <form id="search-form">
-                <label for="search">Search: </label>
                 <input type="text" name="search" id="search-term" placeholder="Movie title" />
             </form>
             <div>
