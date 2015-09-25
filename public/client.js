@@ -189,25 +189,18 @@ var Client = Client || function() {
     }
 
     // Movie details
-
-    function isValidImage(filename) {
-        /* returns true if the filename ends in an image extension */
-        return /\.jpg$|\.png$|\.gif$|\.svg$/.test(filename.trim());
-    }
     
     function renderMovieDetails(data) {
         /* Injects movie data into details area */
         if (data) { // TODO: remove hardcoded ids
-            var poster = document.getElementById("movie-poster"),
-                title = document.getElementById("movie-title"),
+            // Note: movie posters cannot be dynamically loaded because of imdb licensing
+            var title = document.getElementById("movie-title"),
                 year = document.getElementById("movie-year"),
                 rating = document.getElementById("movie-rating"),
                 director = document.getElementById("movie-director"),
                 cast = document.getElementById("movie-cast"),
                 plot = document.getElementById("movie-plot"),
                 details = document.getElementById("movie-details");
-            // Not all movies have posters, so use default if it's missing
-            poster.src = isValidImage(data.Poster) ? data.Poster : "no_image.svg",
             title.innerHTML = data.Title || "";
             year.innerHTML = data.Year || "";
             rating.innerHTML = data.Rated || "";
