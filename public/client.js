@@ -9,13 +9,16 @@ var Client = Client || function() {
         } // else ignore if console unsupported
     }
 
+    // Globals
+
+    var favorites = {},
+        lastSearchResults = [],
+        searchCache = {},
+        detailsCache = {};
+    
     // API
     
-    var API_URL = "http://www.omdbapi.com/?",
-        SEARCH_FORM_ID = "search-form",
-        SEARCH_INPUT_ID = "search-term";
-        
-
+    var API_URL = "http://www.omdbapi.com/?";
 
     function ajax(url, callback) {
         /* Send AJAX GET to URL and pass result to callback */
@@ -56,18 +59,19 @@ var Client = Client || function() {
 
     // Favorites
 
-    var favorites = {};
 
     function setFavorites(obj) {
+        /* update the local copy of favorites */
         favorites = obj;
-        renderSearchResults();
+        renderSearchResults(); // we re-render because the model now includes a new favorite
     }
     
     function fetchFavorites() {
+        /* get favorites from server and update local copy */
         ajax("/favorites",  setFavorites);
     }
     
-    function setFavorite(id) {
+    function addFavorite(id) {
         /* POST a new favorite to the Favorites API */
         var request = new XMLHttpRequest(),
             query = "oid=" + id; // TODO: Make this work with an object instead of querystring
@@ -76,7 +80,7 @@ var Client = Client || function() {
         request.onload = function() { 
             if (request.status >= 200 && request.status < 400) {
                 var data = JSON.parse(request.responseText);
-                setFavorites(data);
+                setFavorites(data); // the POST returns updated favorites list, which we can now save
             } else {
                 throw new Error("Unable to complete AJAX request due to server error");
             }
@@ -84,30 +88,24 @@ var Client = Client || function() {
         request.send(query);
     }
 
-    
     // Search
 
-    var lastSearchResults = [];
-    var searchCache = {};
-    var detailsCache = {};
-    
-    
     function getFavoriteLink(id) {
         /* Constructs an anchor tag to favorite a movie title */
         var $a = document.createElement("a");
         $a.href = "#";
-        $a.innerHTML = "&#9786;";
-        $a.title = "Add favorite";
+        $a.innerHTML = "&#9786;"; // smiley
+        $a.title = "Add favorite"; // this will display a tooltip on mouse hover
         $a.addEventListener("click", function() { 
-            setFavorite(id); // this works because the callback is a closure
+            addFavorite(id); // this works because the callback is a closure
         });
         $a = addClass($a, "fav-control");
         return $a;
     }
 
     function addClass(element, className) {
-        /* Adds the favorite class to DOM element and returns it */
-        if (element.classList) {
+        /* Adds specified class to DOM element and returns it */
+        if (element.classList) { // have to do this two ways to support IE
             element.classList.add(className);
         } else {
             element.className += " " + className;
@@ -123,8 +121,8 @@ var Client = Client || function() {
          <tr><td>Star Wars</td><td><a href="#">Favorite</a></td></tr>
          
          */
-        searchResults = searchResults || lastSearchResults;
-        var $table = document.querySelectorAll("#movie-list")[0];
+        searchResults = searchResults || lastSearchResults; // if nothing is passed in, just use last results
+        var $table = document.querySelectorAll("#movie-list")[0]; // TODO: use config instead of element id
         if (searchResults.length) { // don't bother if there's nothing to show
             $table.innerHTML = "";  // clear out the last results
             for (var i = 0; i < searchResults.length; i++) {
@@ -134,13 +132,17 @@ var Client = Client || function() {
                     title = searchResults[i].Title,
                     id = searchResults[i].imdbID,
                     $a = getFavoriteLink(id, title);
+                // first TD contains the title
                 $titleTD.innerHTML = title;
                 $titleTD.id = id;
                 $titleTD.addEventListener("click", showMovieDetails);
-                if (id in favorites) {
-                    $a = addClass($a, "favorite");
+                // second TD will contain an anchor tag
+                // TODO: Use span instead of anchor?
+                if (id in favorites) { 
+                    $a = addClass($a, "favorite"); 
                 }
                 $favTD.appendChild($a);
+                // add the TD's to the TR, and the TR to the table
                 $tr.appendChild($titleTD);
                 $tr.appendChild($favTD);
                 $table.appendChild($tr);
@@ -185,7 +187,7 @@ var Client = Client || function() {
     
     function renderMovieDetails(data) {
         /* Injects movie data into details area */
-        if (data) {
+        if (data) { // TODO: remove hardcoded ids
             var poster = document.getElementById("movie-poster"),
                 title = document.getElementById("movie-title"),
                 year = document.getElementById("movie-year"),
@@ -194,6 +196,7 @@ var Client = Client || function() {
                 cast = document.getElementById("movie-cast"),
                 plot = document.getElementById("movie-plot"),
                 details = document.getElementById("movie-details");
+            // Not all movies have posters, so use default if it's missing
             poster.src = isValidImage(data.Poster) ? data.Poster : "no_image.svg",
             title.innerHTML = data.Title || "";
             year.innerHTML = data.Year || "";
@@ -208,16 +211,16 @@ var Client = Client || function() {
     function showMovieDetails(event) {
         /* Searches the cache, then the api for the clicked movie and renders the result */
         var movieId = event.target.id;
-        if (movieId) {
-            if (movieId in detailsCache) {
+        if (movieId) { 
+            if (movieId in detailsCache) { // use the cached details if they exist
                 renderMovieDetails(detailsCache[movieId]);
             } else {
-                searchId(movieId, function(data) {
+                searchId(movieId, function(data) { // otherwise get from api and add to cache
                     renderMovieDetails(data);
                     detailsCache[movieId] = data;
                 });
             }
-        }
+        } // TODO: something constructive if the id is missing
     }
 
     function hideMovieDetails() {
@@ -227,12 +230,12 @@ var Client = Client || function() {
 
     // Init
     
-    var $form = document.getElementById(SEARCH_FORM_ID);
-    var $input = document.getElementById(SEARCH_INPUT_ID);
+    var $input = document.getElementById("search-term");
 
-    $input.addEventListener("keyup", searchForTerm);
+    $input.addEventListener("keyup", searchForTerm); // search while typing
  
     fetchFavorites();
+    setInterval(fetchFavorites, 10000); // Refresh favorites in case other users have made changes
     
 }();
 
