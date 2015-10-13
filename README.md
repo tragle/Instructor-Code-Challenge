@@ -14,4 +14,4 @@ I made this for a job interview.
 * No un-favoriting
 * No users -- all visitors share the same favorites
 
-Source code is on GitHub: <https://github.com/tragle/Instructor-Code-Challenge>
+Source code is on GitHub: <https://github.com/tragle/OMDB-Search>
