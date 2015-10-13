@@ -1,6 +1,8 @@
-## Instructor-Code-Challenge
+## OMDB Search
 
 [OMDB Search on Heroku](http://guarded-hollows-9976.herokuapp.com/)
+
+I made this for a job interview.
 
 *Features include:*
 * Search-as-you-type
